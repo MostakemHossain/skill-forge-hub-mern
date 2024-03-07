@@ -12,6 +12,27 @@ app.use(cors());
 app.use(express.json());
 
 
+//verify token
+
+const verifyToken=(req,res,next)=>{
+    const authorization= req.headers.authorization;
+    if(!authorization){
+         return res.status(401).send({
+            message:'Invalid Authorization'
+         })
+    };
+
+    const token= authorization?.split(' ')[1];
+    jwt.verify(token,process.env.ACCESS_SERECT,(err,decoded)=>{
+        if(err){
+            return res.status(403).send({
+                message:'Forbidden accedd'
+             })
+        }
+        res.decoded=decoded;
+        next();
+    })
+}
 
 
 
@@ -46,6 +67,16 @@ async function run() {
 
 
 
+    app.post('/api/set-token',async(req,res)=>{
+        const user=req.body;
+        const token= jwt.sign(user,process.env.ACCESS_SERECT,{
+            expiresIn:'24h'
+        });
+        res.send({token});
+    })
+
+
+
     // routes for users
     app.post('/new-user',async(req,res)=>{
         const newUser= req.body;
@@ -65,14 +96,14 @@ async function run() {
         res.send(result);
     });
 
-    app.get('/user/:email',async(req,res)=>{
+    app.get('/user/:email',verifyToken,async(req,res)=>{
         const id= req.params.id;
         const query={email:email};
         const result= await userCollection.findOne(query);
         res.send(result);
     });
 
-    app.delete('/delete-user/:id',async(req,res)=>{
+    app.delete('/delete-user/:id',verifyToken,async(req,res)=>{
         const id= req.params.id;
         const query={_id: new ObjectId(id)};
         const result= await userCollection.deleteOne(query);
