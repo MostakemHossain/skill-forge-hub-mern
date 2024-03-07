@@ -120,6 +120,49 @@ async function run() {
         const result= await classesCollection.updateOne(filter,updateDoc,options);
         res.send(result);
 
+    });
+
+
+
+
+
+    // !----- Cart Routes ----! 
+
+    app.post('/add-to-cart',async(req,res)=>{
+        const newCartItem=req.body;
+        const result= await cartCollection.insertOne(newCartItem);
+        res.send(result);
+    });
+
+    // get cart item by Id
+    app.get('/cart-item/:id',async(req,res)=>{
+        const id= req.params.id;
+        // const email= req.body.email;
+        const query={
+            courseId:id,
+        };
+        // const projection={classId:1};
+        const result= await cartCollection.findOne(query,{classId:1});
+        res.send(result);     
+    })
+    // cart info by user email
+    app.get('/cart/:email',async(req,res)=>{
+        const email= req.params.email;
+        const query={email:email};
+        const carts= await cartCollection.find(query,{classId:1});
+        const classIds= carts.map((cart)=> new ObjectId(cart.courseId));
+        const query2={_id:{$in:classIds}};
+        const result= await classesCollection.find(query2).toArray();
+        res.send(result);
+
+    });
+
+    // delete cart item
+    app.delete('/delete-cart-item/:id',async(req,res)=>{
+        const id= req.params.id;
+        const query={courseId:id};
+        const result= await cartCollection.deleteOne(query);
+        res.send(result);
     })
 
 
