@@ -1,14 +1,19 @@
 const express = require('express')
 const cors= require('cors');
-const app = express()
+const app = express();
 require('dotenv').config();
 const stripe = require("stripe")(process.env.PAYMENT_SERECT);
+const jwt= require('jsonwebtoken');
 const port = process.env.PORT || 3000
 
  
 //middleware
 app.use(cors());
 app.use(express.json());
+
+
+
+
 
 
 // mongodb connextion
@@ -38,6 +43,64 @@ async function run() {
     const paymentCollection= database.collection("payments");
     const enrolledCollection= database.collection("enrolled");
     const appliedCollection= database.collection("applied");
+
+
+
+    // routes for users
+    app.post('/new-user',async(req,res)=>{
+        const newUser= req.body;
+        const result= await userCollection.insertOne(newUser);
+        res.send(result);
+    });
+
+    app.get('/users', async (req,res)=> {
+        const result= await userCollectionfind({}).toArray();
+        res.send(result);
+    });
+
+    app.get('/users/:id',async(req,res)=>{
+        const id= req.params.id;
+        const query={_id: new ObjectId(id)};
+        const result= await userCollection.findOne(query);
+        res.send(result);
+    });
+
+    app.get('/user/:email',async(req,res)=>{
+        const id= req.params.id;
+        const query={email:email};
+        const result= await userCollection.findOne(query);
+        res.send(result);
+    });
+
+    app.delete('/delete-user/:id',async(req,res)=>{
+        const id= req.params.id;
+        const query={_id: new ObjectId(id)};
+        const result= await userCollection.deleteOne(query);
+        res.send(result);
+    });
+
+    app.put('/update-user/:id',async(req,res)=>{
+        const id= req.params.id;
+        const updateUser=req.body;
+        const filter={_id: new ObjectId(id)};
+        const options={upsert:true}
+        const updateDoc={
+            $set:{
+                name:updateUser.name,
+                email:updateUser.email,
+                role:updateUser.option,
+                address:updateUser.address,
+                about:updateUser.about,
+                photoUrl:updateUser.photoUrl,
+                skills:updateUser.skills ? updateUser.skills : null,
+
+            }
+        };
+        const result= await userCollection.updateOne(filter,updateDoc,options);
+        res.send(result);
+    })
+
+
 
 
     // classes routes here
@@ -356,7 +419,20 @@ async function run() {
         const result= await enrolledCollection.aggregate(pipeline).toArray();
         res.send(result);
     });
+
+    // applied for instructor
+    app.post('/applied-instructor',async(req,res)=>{
+        const data= req.body;
+        const result= await appliedCollection.insertOne(data);
+        res.send(result);
+    });
     
+    app.get('/applied-instructors/:email',async(req,res)=>{
+        const email= req.params.email;
+        const result= await appliedCollection.findOne({email});
+        res.send(result);
+    });
+
 
 
 
