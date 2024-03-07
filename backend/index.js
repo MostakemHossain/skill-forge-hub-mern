@@ -1,7 +1,8 @@
 const express = require('express')
 const cors= require('cors');
 const app = express()
-require('dotenv').config()
+require('dotenv').config();
+const stripe = require("stripe")(process.env.PAYMENT_SERECT);
 const port = process.env.PORT || 3000
 
  
@@ -145,7 +146,7 @@ async function run() {
         const result= await cartCollection.findOne(query,{classId:1});
         res.send(result);     
     })
-    // cart info by user email
+    //  
     app.get('/cart/:email',async(req,res)=>{
         const email= req.params.email;
         const query={email:email};
@@ -163,7 +164,64 @@ async function run() {
         const query={courseId:id};
         const result= await cartCollection.deleteOne(query);
         res.send(result);
+    });
+
+    // PAYMENT Routes
+    app.post("/create-payment-intent", async (req, res) => {
+        const {price}= req.body;
+        const amount= parseInt(price)*100;
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount,
+            currency: "usd",
+            payment_method_types:["card"],
+          });
+          res.send({
+            clientSecret: paymentIntent.client_secret,
+          });
+    });
+
+    // post payment info to db
+
+    app.post('/payment-info',async(req,res)=>{
+        const paymentInfo= req.body;
+        const courseId= paymentInfo.courseId;
+        const userEmail=paymentInfo.userEmail;
+        const singleClassId= req.query.courseId;
+        let query;
+        if(singleClassId){
+            query={courseId:singleClassId,userMail:userEmail};
+        }else{
+            query={courseId:{$in:courseId}};
+        };
+        const classQuery={_id:{$in:courseId.map(id=> new ObjectId(id))}};
+        const classes= await classesCollection.find(classQuery).toArray();
+        const newEnrolledData={
+            userEmail:userEmail,
+            courseId:singleClassId.map(id=> new ObjectId(id)),
+            transactionId:paymentInfo.transactionId
+        };
+
+        const updateDoc={
+            $set:{
+                totalErnrolled: classes.reduce((total,current)=> total+current.totalErnrolled,0)+1 || 0,
+                availableSeats: classes.reduce((total,current)=> total+current.availableSeats,0)-1 || 0,
+            }
+        };
+
+        const updatedResult= await classesCollection.updateMany(query,updateDoc,{upsert:true});
+
+        const enrolledResult=await enrolledCollection.insertOne(newEnrolledData);
+        const deletedResult= await cartCollection.deleteMany(query);
+        const paymentResult= await paymentCollection.insertOne(paymentInfo);
+        res.send({
+            paymentResult,
+            deletedResult,
+            enrolledResult,
+            updatedResult
+        })
     })
+
 
 
 
