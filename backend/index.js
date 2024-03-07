@@ -26,7 +26,7 @@ const verifyToken=(req,res,next)=>{
     jwt.verify(token,process.env.ACCESS_SERECT,(err,decoded)=>{
         if(err){
             return res.status(403).send({
-                message:'Forbidden accedd'
+                message:'Forbidden access'
              })
         }
         res.decoded=decoded;
@@ -73,7 +73,36 @@ async function run() {
             expiresIn:'24h'
         });
         res.send({token});
-    })
+    });
+
+    // middleware for admin and instructor
+    const verifyAdmin= async(req,res,next)=>{
+        const email= req.decoded.email;
+        const query= {email:email};
+
+        const user= await userCollection.findOne(query);
+        if(user.role==='admin'){
+            next();
+        }else{
+            return res.status(401).send({
+                message:'Unauthorized access'
+             })
+        }
+    };
+
+    const verifyInstructor= async(req,res,next)=>{
+        const email= req.decoded.email;
+        const query= {email:email};
+
+        const user= await userCollection.findOne(query);
+        if(user.role==='instructor'){
+            next();
+        }else{
+            return res.status(401).send({
+                message:'Unauthorized access'
+             })
+        }
+    }
 
 
 
@@ -103,14 +132,14 @@ async function run() {
         res.send(result);
     });
 
-    app.delete('/delete-user/:id',verifyToken,async(req,res)=>{
+    app.delete('/delete-user/:id',verifyToken,verifyAdmin,async(req,res)=>{
         const id= req.params.id;
         const query={_id: new ObjectId(id)};
         const result= await userCollection.deleteOne(query);
         res.send(result);
     });
 
-    app.put('/update-user/:id',async(req,res)=>{
+    app.put('/update-user/:id',verifyToken,verifyAdmin,async(req,res)=>{
         const id= req.params.id;
         const updateUser=req.body;
         const filter={_id: new ObjectId(id)};
@@ -135,7 +164,7 @@ async function run() {
 
 
     // classes routes here
-    app.post('/new-class',async (req,res)=>{
+    app.post('/new-class',verifyToken,verifyInstructor,async (req,res)=>{
         const newClass= req.body;
         const result= await classesCollection.insertOne(newClass);
         res.send(result);
@@ -148,7 +177,7 @@ async function run() {
     })
 
     // get classes by instructor email address
-    app.get('/classes/:email',async(req,res)=>{
+    app.get('/classes/:email',verifyToken,verifyInstructor,async(req,res)=>{
         const email= req.params.email;
         const query={instructorEmail:email};
         const result= await classesCollection.find(query).toArray();
@@ -161,7 +190,7 @@ async function run() {
         res.send(result);
     });
     // update class status and reason
-    app.patch('/change-status/:id',async(req,res)=>{
+    app.patch('/change-status/:id',verifyToken,verifyAdmin,async(req,res)=>{
         const id= req.params.id;
         const status= req.body.status;
         const reason= req.body.reason;
@@ -196,7 +225,7 @@ async function run() {
     });
 
     // update class details (all data)
-    app.put('/update-class/:id',async(req,res)=>{
+    app.put('/update-class/:id',verifyToken,verifyInstructor,async(req,res)=>{
         const id= req.params.id;
         const updateClass= req.body;
         const filter={_id: new ObjectId(id)};
@@ -223,14 +252,14 @@ async function run() {
 
     // !----- Cart Routes ----! 
 
-    app.post('/add-to-cart',async(req,res)=>{
+    app.post('/add-to-cart',verifyToken,async(req,res)=>{
         const newCartItem=req.body;
         const result= await cartCollection.insertOne(newCartItem);
         res.send(result);
     });
 
     // get cart item by Id
-    app.get('/cart-item/:id',async(req,res)=>{
+    app.get('/cart-item/:id',verifyToken,async(req,res)=>{
         const id= req.params.id;
         // const email= req.body.email;
         const query={
@@ -240,8 +269,8 @@ async function run() {
         const result= await cartCollection.findOne(query,{classId:1});
         res.send(result);     
     })
-    //  
-    app.get('/cart/:email',async(req,res)=>{
+    //  cart info by user email
+    app.get('/cart/:email',verifyToken,async(req,res)=>{
         const email= req.params.email;
         const query={email:email};
         const carts= await cartCollection.find(query,{classId:1});
@@ -253,7 +282,7 @@ async function run() {
     });
 
     // delete cart item
-    app.delete('/delete-cart-item/:id',async(req,res)=>{
+    app.delete('/delete-cart-item/:id',verifyToken,async(req,res)=>{
         const id= req.params.id;
         const query={courseId:id};
         const result= await cartCollection.deleteOne(query);
@@ -277,7 +306,7 @@ async function run() {
 
     // post payment info to db
 
-    app.post('/payment-info',async(req,res)=>{
+    app.post('/payment-info',verifyToken,async(req,res)=>{
         const paymentInfo= req.body;
         const courseId= paymentInfo.courseId;
         const userEmail=paymentInfo.userEmail;
@@ -382,7 +411,7 @@ async function run() {
 
     // admin-status
 
-    app.get('/admin-stats',async(req,res)=>{
+    app.get('/admin-stats',verifyToken,verifyAdmin,async(req,res)=>{
         const approvedClasses= (await classesCollection.find({status:'Approved'}).toArray()).length;
         const pendingClasses= (await classesCollection.find({status:'pending'}).toArray()).length;
 
@@ -406,7 +435,7 @@ async function run() {
           res.send(instructor);
     });
 
-    app.get('/enrolled-classes/:email',async(req,res)=>{
+    app.get('/enrolled-classes/:email',verifyToken,async(req,res)=>{
         const email= req.params.email;
         const query={
             userEmail:email
