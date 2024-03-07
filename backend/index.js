@@ -220,7 +220,74 @@ async function run() {
             enrolledResult,
             updatedResult
         })
+    });
+
+    // payment history
+    app.get('/payment-history/:email',async (req,res)=>{
+        const email= req.query.email;
+        const query={userMail:email};
+        const result= await paymentCollection.find(query).sort({date:-1}).toArray();
+        res.send(result);
+    });
+
+    //payment history length
+    app.get('/payment-history-length/:email',async (req,res)=>{
+        const email= req.query.email;
+        const query={userMail:email};
+        const total= await paymentCollection.countDocuments(query);
+        res.send({
+            total:total
+        });
+    });
+
+    // EnrolledMent Route
+    app.get('/popular-classes',async(req,res)=>{
+        const result= await classesCollection.find().sort({totalErnrolled:-1}).limit(6).toArray();
+        res.send(result);
+    });
+
+    app.get('/popular_instructors',async(req,res)=>{
+        const pipeline= [
+            {
+                $group:{
+                    _id:"$instructorEmail",
+                    totalErnrolled:{$sum:"$totalEnrolled"} 
+                }
+            },
+            {
+                $lookup:{
+                    from:"users",
+                    localField:"_id",
+                    foreignField:"email",
+                    as:"instructor"
+                }
+            },
+            {
+                $project:{
+                    _id:0,
+                    instructor:{
+                        $arrayElemAt:["$instructor",0]
+                    },
+                    totalErnrolled:1
+
+                }
+            },
+            {
+                $sort:{
+                    totalErnrolled:-1,
+                }
+            },
+            {
+                $limit:6
+            }
+        ];
+
+        const result= await classesCollection.aggregate(pipeline).toArray();
+        res.send(result);
     })
+
+
+
 
 
 
