@@ -44,8 +44,13 @@ async function run() {
         const newClass= req.body;
         const result= await classesCollection.insertOne(newClass);
         res.send(result);
-    })
+    });
 
+    app.get('/classes',async(req,res)=>{
+        const query={status: "Approved",};
+        const result= await classesCollection.find(query).toArray();
+        res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
