@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-const photoURL= "login1.jpeg"
+const photoURL = "login1.jpeg";
 
 const navLinks = [
   { name: "Home", route: "/" },
@@ -85,21 +85,25 @@ const NavBar = () => {
     }
   }, [scrollPosition]);
 
+  const handleLogOut = () => {
+    // Handle logout logic
+  };
 
-  const handleLogOut=()=>{
-
-  }
   return (
     <motion.nav
-    initial={{opacity:0}}
-    animate={{opacity:1}}
-    transition={{duration:0.5}}
-    className={`${isHome?navBg:'bg-white dark:bg-black backdrop-blur-2xl'} ${isFixed?'static':'fiexd'} top-0 transition-colors duration-500 ease-in-out w-full z-10`}>
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className={`${isHome ? navBg : 'bg-white dark:bg-black backdrop-blur-2xl'} ${isFixed ? 'static' : 'fixed'} top-0 transition-colors duration-500 ease-in-out w-full z-10`}
+    >
       <div className="lg:w-[95%] mx-auto sm:px-6 lg:px-6">
         <div className="px-4 py-4 flex items-center justify-between">
           {/* logo  */}
-          <div onClick={()=>navigate('/')} className="flex-shrink-0 cursor-pointer pl-7 md:p-0">
-             <h1 className="text-2xl inline-flex gap-3 items-center font-bold dark:text-white">
+          <div
+            onClick={() => navigate('/')}
+            className="flex-shrink-0 cursor-pointer pl-7 md:p-0"
+          >
+            <h1 className="text-2xl text-gray-100 inline-flex gap-3 items-center font-bold dark:text-white">
               Skill Forge Hub <img className="w-8 h-8" src="logo1.png" alt="" />
             </h1>
             <p className="font-bold text-[13px] tracking-[8px] text-secondary">
@@ -109,8 +113,12 @@ const NavBar = () => {
 
           {/* mobile menu icon  */}
           <div className="md:hidden flex items-center">
-            <button type="button" onClick={toggleMobileMenu} className="text-gray-300 hover:text-white outline-none">
-                <FaBars className="h-6 w-6 hover:text-primary"/>
+            <button
+              type="button"
+              onClick={toggleMobileMenu}
+              className="text-gray-300 hover:text-white outline-none"
+            >
+              <FaBars className="h-6 w-6 hover:text-primary" />
             </button>
           </div>
           {/* navigational Links  */}
@@ -121,7 +129,7 @@ const NavBar = () => {
                   <li key={link.name}>
                     <NavLink
                       to={link.route}
-                      style={{whiteSpace:"nowrap"}}
+                      style={{ whiteSpace: "nowrap" }}
                       className={({ isActive }) =>
                         `font-bold ${
                           isActive
@@ -186,35 +194,45 @@ const NavBar = () => {
                   </li>
                 )}
 
-                {
-                    user && <li>
-                        <NavLink  className={({ isActive }) =>
-                        `font-bold ${
-                          isActive
-                            ? "text-secondary"
-                            : `${
-                                navBg.includes("bg-transparent")
-                                  ? "text-white"
-                                  : "text-black dark:text-white"
-                              }`
-                        }
+                {user && (
+                  <>
+                    <li>
+                      <NavLink
+                        className={({ isActive }) =>
+                          `font-bold ${
+                            isActive
+                              ? "text-secondary"
+                              : `${
+                                  navBg.includes("bg-transparent")
+                                    ? "text-black dark:text-white"
+                                    : "text-black dark:text-white"
+                                }`
+                          }
                        hover:text-secondary duration-100
                        `
-                      } to='/dashboard'>
-                            Dashboard
-                        </NavLink>
+                        }
+                        to="/dashboard"
+                      >
+                        Dashboard
+                      </NavLink>
                     </li>
-                }
-                {
-                    user && <li>
-                        <img src={photoURL} className="h-[40px] w-[40px] rounded-full" alt="" />
+                    <li>
+                      <img
+                        src={photoURL}
+                        className="h-[40px] w-[40px] rounded-full"
+                        alt=""
+                      />
                     </li>
-                }
-                {
-                    user && <li>
-                        <NavLink onClick={handleLogOut} className='font-bold px-3 py-2 bg-secondary rounded-xl text-white'>LogOut</NavLink>
+                    <li>
+                      <NavLink
+                        onClick={handleLogOut}
+                        className="font-bold px-3 py-2 bg-secondary rounded-xl text-white"
+                      >
+                        LogOut
+                      </NavLink>
                     </li>
-                }
+                  </>
+                )}
 
                 {/* color toggle  */}
                 <li>
