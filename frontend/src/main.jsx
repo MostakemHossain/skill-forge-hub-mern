@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom/client';
 import {
   RouterProvider
 } from "react-router-dom";
+import 'swiper/css';
 import './index.css';
 import router from './routes/router';
 const queryClient = new QueryClient()

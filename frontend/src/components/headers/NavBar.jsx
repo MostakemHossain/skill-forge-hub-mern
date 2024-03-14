@@ -76,10 +76,9 @@ const NavBar = () => {
       }
     } else {
       setNavBg(
-        `${
-          isHome || location.pathname === "/"
-            ? "bg-transparent"
-            : "bg-white dark:bg-black"
+        `${isHome || location.pathname === "/"
+          ? "bg-transparent"
+          : "bg-white dark:bg-black"
         } dark:text-white text-black`
       );
     }
@@ -103,7 +102,7 @@ const NavBar = () => {
             onClick={() => navigate('/')}
             className="flex-shrink-0 cursor-pointer pl-7 md:p-0"
           >
-            <h1 className="text-2xl text-gray-100 inline-flex gap-3 items-center font-bold dark:text-white">
+            <h1 className="text-2xl text-red-600 inline-flex gap-3 items-center font-bold dark:text-white">
               Skill Forge Hub <img className="w-8 h-8" src="logo1.png" alt="" />
             </h1>
             <p className="font-bold text-[13px] tracking-[8px] text-secondary">
@@ -131,14 +130,12 @@ const NavBar = () => {
                       to={link.route}
                       style={{ whiteSpace: "nowrap" }}
                       className={({ isActive }) =>
-                        `font-bold ${
-                          isActive
-                            ? "text-secondary"
-                            : `${
-                                navBg.includes("bg-transparent")
-                                  ? "text-black dark:text-white"
-                                  : "text-black dark:text-white"
-                              }`
+                        `font-bold ${isActive
+                          ? "text-secondary"
+                          : `${navBg.includes("bg-transparent")
+                            ? "text-black dark:text-white"
+                            : "text-black dark:text-white"
+                          }`
                         }
                    hover:text-secondary duration-100
                    `
@@ -154,14 +151,12 @@ const NavBar = () => {
                   <li>
                     <NavLink
                       className={({ isActive }) =>
-                        `font-bold ${
-                          isActive
-                            ? "text-secondary"
-                            : `${
-                                navBg.includes("bg-transparent")
-                                  ? "text-white"
-                                  : "text-black dark:text-white"
-                              }`
+                        `font-bold ${isActive
+                          ? "text-secondary"
+                          : `${navBg.includes("bg-transparent")
+                            ? "text-white"
+                            : "text-black dark:text-white"
+                          }`
                         }
                        hover:text-secondary duration-100
                        `
@@ -175,14 +170,12 @@ const NavBar = () => {
                   <li>
                     <NavLink
                       className={({ isActive }) =>
-                        `font-bold ${
-                          isActive
-                            ? "text-secondary"
-                            : `${
-                                navBg.includes("bg-transparent")
-                                  ? "text-white"
-                                  : "text-black dark:text-white"
-                              }`
+                        `font-bold ${isActive
+                          ? "text-secondary"
+                          : `${navBg.includes("bg-transparent")
+                            ? "text-white"
+                            : "text-black dark:text-white"
+                          }`
                         }
                    hover:text-secondary duration-100
                    `
@@ -199,14 +192,12 @@ const NavBar = () => {
                     <li>
                       <NavLink
                         className={({ isActive }) =>
-                          `font-bold ${
-                            isActive
-                              ? "text-secondary"
-                              : `${
-                                  navBg.includes("bg-transparent")
-                                    ? "text-black dark:text-white"
-                                    : "text-black dark:text-white"
-                                }`
+                          `font-bold ${isActive
+                            ? "text-secondary"
+                            : `${navBg.includes("bg-transparent")
+                              ? "text-black dark:text-white"
+                              : "text-black dark:text-white"
+                            }`
                           }
                        hover:text-secondary duration-100
                        `
