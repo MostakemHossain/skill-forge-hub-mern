@@ -1,5 +1,6 @@
 import Gallary from "./Gallary/Gallary"
 import HeroContainer from "./Hero/HeroContainer"
+import PopularClasses from "./PopularClasses/PopularClasses"
 
 
 const Home = () => {
@@ -8,6 +9,7 @@ const Home = () => {
       <HeroContainer />
       <div className="max-w-screen-2xl mx-auto">
         <Gallary />
+        <PopularClasses />
 
       </div>
     </section>
