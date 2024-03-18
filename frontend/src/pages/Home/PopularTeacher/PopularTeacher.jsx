@@ -53,7 +53,9 @@ const PopularTeacher = () => {
                     </div>
 
 
-                </> : <></>
+                </> : <>
+                    <p className="text-center font-4xl font-bold">No Instructor Available</p>
+                </>
             }
         </div>
 
