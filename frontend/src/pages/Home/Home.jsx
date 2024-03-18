@@ -1,6 +1,7 @@
 import Gallary from "./Gallary/Gallary"
 import HeroContainer from "./Hero/HeroContainer"
 import PopularClasses from "./PopularClasses/PopularClasses"
+import PopularTeacher from "./PopularTeacher/PopularTeacher"
 
 
 const Home = () => {
@@ -10,6 +11,7 @@ const Home = () => {
       <div className="max-w-screen-2xl mx-auto">
         <Gallary />
         <PopularClasses />
+        <PopularTeacher />
 
       </div>
     </section>
