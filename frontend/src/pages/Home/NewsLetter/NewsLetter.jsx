@@ -16,7 +16,7 @@ const NewsLetter = () => {
     };
 
     return (
-        <div className="md:w-[60%] mx-auto p-10 md:border border-gray-300 rounded-lg mt-10">
+        <div className="md:w-[60%] dark:bg-white mx-auto p-10 md:border border-gray-300 rounded-lg mt-10">
             <h2 className="md:text-5xl text-3xl font-semibold mb-2 text-center">Subscribe to our Newsletter</h2>
             <p className="text-gray-700 p-4 text-center md:text-3xl text-xl mb-4">What us to email you with the latest blockbuster news</p>
             <form onSubmit={handleSubmit}>
