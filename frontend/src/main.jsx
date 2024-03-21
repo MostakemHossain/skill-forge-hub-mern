@@ -9,15 +9,18 @@ import {
 import 'swiper/css';
 import './index.css';
 import router from './routes/router';
+import AuthProvider from './utilities/providers/AuthProvider';
 const queryClient = new QueryClient()
 
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
+  <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
 
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </AuthProvider>
 
 
 )
